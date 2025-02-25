@@ -6,6 +6,7 @@ students: list = []
 
 app = Flask(__name__)
 
+
 class StudentAPI(MethodView):
     def get(self, student_id=None):
         if student_id is None:
@@ -25,7 +26,9 @@ class StudentAPI(MethodView):
             grade = request.json['grade']
             student = Student(id, name, age, grade)
             students.append(student)
-            return {'response': f'{student.id} has been added to the list of students'}, 201
+            return {
+                'response': f'{student.id} has been added'
+            }, 201
         except KeyError as e:
             return {'response': f'Missing parameter: {str(e)}'}, 400
 
@@ -40,8 +43,10 @@ class StudentAPI(MethodView):
 
     def delete(self, student_id):
         try:
-            student = students.pop(student_id)
-            return {'response': f'{student_id} has been removed from the list of students'}
+            students.pop(student_id)
+            return {
+                'response': f'{student_id} has been removed'
+            }
         except IndexError:
             return {'response': f'{student_id} not found'}, 404
 
@@ -49,7 +54,11 @@ class StudentAPI(MethodView):
 # Register the class-based view with URL rules
 student_view = StudentAPI.as_view('student_api')
 app.add_url_rule('/student/', view_func=student_view, methods=['POST', 'GET'])
-app.add_url_rule('/student/<int:student_id>', view_func=student_view, methods=['GET', 'PUT', 'DELETE'])
+app.add_url_rule(
+    '/student/<int:student_id>',
+    view_func=student_view,
+    methods=['GET', 'PUT', 'DELETE'],
+)
 
 if __name__ == '__main__':
     app.run(debug=True)
